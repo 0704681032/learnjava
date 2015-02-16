@@ -91,12 +91,12 @@ public class App
      	System.out.println("2:"+jedis.get("foo2"));
      	//jedis.set("java4", "oracle4");
      	
-     	Jedis jedis2 =  new Jedis("10.10.159.164", 19000);//直接连接codis-proxy,注意这里的端口不是6379
-    	System.out.println("3:"+jedis2.get("foo1099"));
-     	System.out.println("3:"+jedis2.get("foo1439"));
-    	System.out.println("3:"+jedis2.get("foo1"));
-     	System.out.println("3:"+jedis2.get("foo2"));
-     	System.out.println("3:"+jedis2.get("java4"));
+//     	Jedis jedis2 =  new Jedis("10.10.159.164", 19000);//直接连接codis-proxy,注意这里的端口不是6379
+//    	System.out.println("3:"+jedis2.get("foo1099"));
+//     	System.out.println("3:"+jedis2.get("foo1439"));
+//    	System.out.println("3:"+jedis2.get("foo1"));
+//     	System.out.println("3:"+jedis2.get("foo2"));
+//     	System.out.println("3:"+jedis2.get("java4"));
      	/*
     	System.out.println("3:"+jedis2.get("java"));//实际运行情况获取到了java
     	System.out.println("3:"+jedis2.get("java1"));
