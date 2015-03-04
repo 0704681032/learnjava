@@ -20,7 +20,6 @@
 package org.apache.curator.test;
 
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
 
 /**

@@ -46,11 +46,11 @@ public class App
     	//test1();
     	//test2();
     	test2();
-    	try {
-			countDownLatch.await(); //防止程序退出
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+//    	try {
+//			countDownLatch.await(); //防止程序退出
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
     }
     
     
@@ -62,12 +62,12 @@ public class App
         try {
         	Jedis jedis = jedisPool.getResource();
         	
-        	//initData(jedis);
+        	initData(jedis);
         	
         	//testCRC32();
         	
-        	System.out.println( jedis.get("foo1099"));
-        	System.out.println( jedis.get("foo1439"));
+        	//System.out.println( jedis.get("foo1099"));
+        	//System.out.println( jedis.get("foo1439"));
         	
         	//System.out.println( jedis.get("handsom"));
         	//System.out.println( jedis.get("beauty"));
@@ -84,7 +84,7 @@ public class App
     
     public static void test2() {
     	
-    	Jedis jedis =  new Jedis("10.11.8.20", 19000);//直接连接codis-proxy,注意这里的端口不是6379
+    	Jedis jedis =  new Jedis("10.10.159.165", 19000);//直接连接codis-proxy,注意这里的端口不是6379
     	System.out.println("2:"+jedis.get("foo1099"));
      	System.out.println("2:"+jedis.get("foo1439"));
      	System.out.println("2:"+jedis.get("foo1"));
@@ -103,18 +103,24 @@ public class App
     	*/
     	
     	 JedisResourcePool jedisPool = new RoundRobinJedisPool("10.10.159.165:2181,10.10.159.164:2181,10.11.8.20:2181", 30000, "/zk/codis/db_test/proxy", new JedisPoolConfig());
-         try {
+         System.out.println(jedisPool);
+    	 try {
          	Jedis jedis3 = jedisPool.getResource();
+         	
+         	//initData(jedis3);
+         	
         	System.out.println("5:"+jedis3.get("foo1099"));
          	System.out.println("5:"+jedis3.get("foo1439"));
         	System.out.println("5:"+jedis3.get("foo1"));
          	System.out.println("5:"+jedis3.get("foo2"));
-        	System.out.println("5:"+jedis3.get("java4"));
+        	System.out.println("5:"+jedis3.get("first"));
+        	System.out.println("5:"+jedis3.get("second"));
+        	System.out.println("5:"+jedis3.get("third"));
         	//System.out.println("4:"+jedis3.get("java"));//实际运行情况获取到了java
         	//System.out.println("4:"+jedis3.get("java1"));
         	
          } catch (Exception e) {
-        	 
+        	 e.printStackTrace();
          }
     }
     
@@ -128,8 +134,8 @@ public class App
          	
          	//testCRC32();
          	
-         	System.out.println( jedis.get("foo1099"));
-         	System.out.println( jedis.get("foo1439"));
+         	//System.out.println( jedis.get("foo1099"));
+         	//System.out.println( jedis.get("foo1439"));
          	
          	//System.out.println( jedis.get("handsom"));
          	//System.out.println( jedis.get("beauty"));
@@ -152,9 +158,9 @@ public class App
 
 	private static void initData(Jedis jedis) {
 		int i = 0;
-		while ( i++ < 5000 ) {
+		while ( i++ < 100000 ) {
 			  String result = jedis.set("foo"+i, "bar"+i);
-			  System.out.println(result);
+			  System.out.println(i+":"+result);
 		}
 	}
 }

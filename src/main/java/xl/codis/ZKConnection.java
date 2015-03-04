@@ -21,7 +21,12 @@ public class ZKConnection {
     private CountDownLatch connectedSignal = new CountDownLatch(1);
     protected ZooKeeper zk;
 
-    /**
+    public ZooKeeper getZk() {
+		return zk;
+	}
+
+
+	/**
      * 连接zookeeper server
      */
     public void connect() throws Exception {
