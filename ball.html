@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=0.6, maximum-scale=0.6, user-scalable=0" />
+	<title>Document</title>
+	<style>
+	html, body{
+	  height: 100%;
+	  overflow: hidden;
+	  background: black;
+    }	
+
+	/*大球的通用样式*/
+	ul {
+	  background: white;
+	  color: black;
+	  list-style-type:none;
+	  padding: 0;
+	}
+
+	/*小球的通用样式*/
+	ul >li {
+	  width: 40px;
+	  height: 40px;
+	  border-radius:50%;
+	  background: white;
+	  line-height: 40px;
+	  font-size: 1.5rem;
+	  text-align: center;
+	}
+
+	/*大球的样式*/
+	#levelballs {
+	  width: 80px;
+	  height: 80px;
+	  margin: 220px auto;
+	  border-radius:50%;
+	  -webkit-transform: rotate(45deg);
+	}
+
+	/*大球周围的小球*/
+	#levelballs >li {
+	  position: absolute;
+	  float: left;
+	  margin: 20px 0 0 240px;
+	  -webkit-transform-origin: -200px 20px;
+	}
+
+	#levelballs >li:nth-child(1){
+	  -webkit-transform: rotate(0deg);
+	}
+
+	#levelballs >li:nth-child(2){
+	  -webkit-transform: rotate(90deg);
+	}
+
+	#levelballs >li:nth-child(3){
+	  -webkit-transform: rotate(180deg);
+	}
+
+	#levelballs >li:nth-child(4){
+	  -webkit-transform: rotate(270deg);
+	}
+
+	/*玩家添加的小球*/
+	#addedballs {
+	  width: 40px;
+	  margin: 0 auto;
+	  background: transparent;
+	}
+
+	#addedballs >li {
+	  margin-bottom: 10px;
+	}
+
+	/*小球与大球中间的连线*/
+	#levelballs >li:before {
+	  content: "";
+	  float: left;
+	  display: block;
+	  width: 160px;
+	  height: 1px;
+	  margin: 20px 0 0 -160px;
+	  background: white;
+	}
+
+
+	@-webkit-keyframes rotate{
+	  from {-webkit-transform:rotate(0deg);}
+	  to {-webkit-transform:rotate(360deg);}
+	}
+
+	#levelballs.play {
+	  -webkit-animation-name: rotate;
+	  -webkit-animation-duration: 5.0s;
+	  -webkit-animation-iteration-count: infinite;
+	  -webkit-animation-timing-function: linear;  
+	}
+
+	#levelballs.gameover {
+	  -webkit-animation-play-state:paused; 
+	}
+
+	body.win, body.lose {
+	  -webkit-user-select: none;
+	  -webkit-transition-property: background-color;
+	  -webkit-transition-duration: 0.7s;
+	  -webkit-transition-timing-function: ease-in-out;
+	}
+
+	body.win {
+	  background: green;
+	}
+
+	body.lose {
+	  background: red;
+	}
+	</style>
+</head>
+<body>
+<div>
+  <ul id="levelballs" class="play">
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+  </ul>
+  <ul id="addedballs">
+    <li>8</li>
+    <li>7</li>
+    <li>6</li>
+    <li>5</li>
+    <li>4</li>
+    <li>3</li>
+    <li>2</li>
+    <li>1</li>
+  </ul>
+</div>
+<script type="text/javascript">
+void function(){
+  'use strict'
+  function getRotationOf(el){
+    var style = window.getComputedStyle(el);
+    if(style){
+      var prop = style.getPropertyValue("-webkit-transform") || style.getPropertyValue('transform');
+      prop = /matrix\((.*)\)/g.exec(prop)[1].split(',');
+      prop = Math.round(Math.atan2(prop[1], prop[0]) * (180/Math.PI));
+      return prop;
+    }
+  }
+
+  //碰撞检测              
+  function testBalls(deg){
+    var balls = document.getElementById("levelballs").getElementsByTagName('li');
+
+    for(var i = 0; i < balls.length; i++){
+      var d = getRotationOf(balls[i]);
+      if(Math.abs(deg - d) <= 10 || 
+        Math.abs(deg + 360 - d) <= 10){
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function gameOver(state){
+    setTimeout(function(){
+      //这里延迟停止动画，不然的话appendChild异步插入，会出问题
+	  //如果停止了css3动画，再appendChild，拿不到之前的matrix属性
+      levelballs.className += ' gameover';
+    });
+    
+    document.body.className = state;
+    document.documentElement.removeEventListener('touchstart', appendBall);
+    document.documentElement.removeEventListener('mousedown', appendBall);
+    document.body.addEventListener('touchstart', location.reload.bind(location));
+    document.body.addEventListener('mousedown', location.reload.bind(location));
+  }
+
+  function appendBall(){
+    var balls = document.getElementById("addedballs").getElementsByTagName('li');
+    if(balls.length){
+      var deg = 90 - getRotationOf(levelballs);
+      if(deg > 180) deg -= 360;  //角度从 -180 ~ 180
+      var pass = testBalls(deg);
+      balls[0].style.webkitTransform = 'rotate(' + deg + 'deg)';
+      levelballs.appendChild(balls[0]);
+      if(pass){
+        //成功插入
+        if(balls.length <= 0){ //所有的小球都插入了
+          gameOver("win");
+        }
+      }else{
+        //失败
+        gameOver("lose");
+      }
+    }
+  }
+
+  document.documentElement.addEventListener('touchstart', appendBall);
+  document.documentElement.addEventListener('mousedown', appendBall);
+}();
+</script>
+</body>
+</html>

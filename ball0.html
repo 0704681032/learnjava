@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=0.6, maximum-scale=0.6, user-scalable=0" />
+	<title>Document</title>
+	<style>
+	html, body{
+	  height: 100%;
+	  overflow: hidden;
+	  background: black;
+	  -webkit-user-select: none;
+	}
+
+	body.trans{
+	  -webkit-transition-property: background-color;
+	  -webkit-transition-duration: 0.7s;
+	  -webkit-transition-timing-function: ease-in-out;
+	}
+
+	/*大球的通用样式*/
+	ul {
+	  background: white;
+	  color: black;
+	  list-style-type:none;
+	  padding: 0;
+	}
+
+	/*小球的通用样式*/
+	ul >li {
+	  width: 40px;
+	  height: 40px;
+	  border-radius:50%;
+	  background: white;
+	  line-height: 40px;
+	  font-size: 1.5rem;
+	  text-align: center;
+	}
+
+	/*大球的样式*/
+	#levelballs {
+	  width: 80px;
+	  height: 80px;
+	  margin: 220px auto;
+	  border-radius:50%;
+	  -webkit-transform: rotate(0deg);
+	}
+
+	/*大球周围的小球*/
+	ul#levelballs >li {
+	  position: absolute;
+	  float: left;
+	  margin: 20px 0 0 240px;
+	  -webkit-transform: rotate(0deg);
+	  -webkit-transform-origin: -200px 20px;
+	}
+
+	/*小球与大球中间的连线*/
+	ul#levelballs >li:before {
+	  content: "";
+	  float: left;
+	  display: block;
+	  width: 160px;
+	  height: 1px;
+	  margin: 20px 0 0 -160px;
+	  background: white;
+	}
+
+	/*玩家添加的小球*/
+	#addedballs {
+	  width: 40px;
+	  margin: 0 auto;
+	  background: transparent;
+	}
+
+	#addedballs >li {
+	  margin-bottom: 10px;
+	}
+
+	/*中间那个关卡数字，直接写在ul里面会跟着旋转，所以写在外面*/
+	body:after {
+	  content: attr(data-level);
+	  position: absolute;
+	  top: 230px;
+	  left: 50%;
+	  width: 40px;
+	  margin-left: -20px;
+	  font-size: 1.5rem;
+	  text-align: center;
+	  line-height: 80px;
+	}
+	</style>
+	<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js" ></script> 
+</head>
+<body>
+<div>
+  <ul id="levelballs">
+
+  </ul>
+  <ul id="addedballs">
+
+  </ul>
+</div>
+<script type="text/javascript">
+function Animation(target, dur){
+  this.target = target;
+  this.dur = dur;
+  this.easing = function(p){return p};
+}
+
+Animation.prototype.onFinished = function(){
+  console.log('animation finished');
+}
+
+Animation.prototype.onProgress = function(p){
+  console.log('animation playing: ' + p);
+}
+
+Animation.prototype.start = function(){
+  this.p = 0;
+  this.startTime = Date.now();
+  
+  var self = this;
+  this._animation = requestAnimationFrame(function f(){
+    if(self.p >= 1){
+      self.onProgress(self.easing(1.0));
+      self.onFinished();
+    }else{
+      self.p = (Date.now() - self.startTime) / self.dur;
+      self.onProgress(self.easing(self.p));
+      self._animation = requestAnimationFrame(f);
+    }
+  });  
+}
+
+Animation.prototype.stop = function(){
+  cancelAnimationFrame(this._animation);
+}
+
+//关卡数据
+var levelDatas = [
+  {
+    speed: 5000,   //旋转周期
+  	balls: [0, 90, 270, 180],  //初始化小球
+    adding: 8  //玩家可以添加的小球
+  },
+  {
+    speed: 5000,
+    balls: [0, 60, 120, 180, 240, 300],
+    adding: 10
+  },
+  {
+    speed: 6500,
+    balls: [0, 180],
+    adding: 20
+  },
+  {
+    speed: 5000,
+    balls: [0, 45, 90, 135, 180, 225, 270, 315],
+    adding: 12,
+    reverse: true
+  },
+  {
+    speed: 5000,
+    balls: [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330],
+    adding: 8
+  }
+];
+
+void function(){'use strict'
+  var levelballs = document.getElementById("levelballs");
+  var addedballs = document.getElementById("addedballs");
+  var anim;
+  
+  //初始化旋转小球              
+  function initBall(deg, text){
+    var li = document.createElement('li');
+    li.style.webkitTransform = 'rotate(' + deg + 'deg)';
+    li.innerHTML = text || '';
+	levelballs.appendChild(li);
+  }
+  
+  //初始化玩家可以添加的小球
+  function adding(idx){
+    var li = document.createElement('li');
+    li.innerHTML = idx;
+    addedballs.appendChild(li);
+  }
+  
+  //初始化关卡              
+  function initLevel(level){
+    level = level % levelDatas.length;
+    document.body.setAttribute('data-level', level + 1);
+    var data = levelDatas[level];
+    
+    for(var i = 0; i < data.balls.length; i++){
+    	initBall(data.balls[i]);
+    }
+    
+    for(var i = 0; i < data.adding; i++){
+    	adding(data.adding - i);
+    }
+    
+    var reverse = !!data.reverse ? -1 : 1;
+    
+    anim = new Animation(levelballs, data.speed);
+
+    anim.onProgress = function(p){
+      this.target.style.webkitTransform = 'rotate(' + reverse * p * 360 + 'deg)'; 
+    } 
+    anim.onFinished = function(){
+      anim.start();
+    }
+
+    anim.start();    
+  }             
+  
+  var level =  0 | (""+location.hash).slice(1);
+  initLevel(level);
+  
+  //玩家将小球添加
+  function appendBall(evt){
+  	var balls = addedballs.getElementsByTagName('li');
+    if(balls.length){
+      var deg = 90 - (0 | parseInt(levelballs.style.webkitTransform.slice(7)));
+      if(deg < 0) deg += 360;
+      var pass = testBalls(deg);
+      balls[0].style.webkitTransform = 'rotate(' + deg + 'deg)';
+      levelballs.appendChild(balls[0]);
+      if(!pass){
+		gameOver(false);
+      }else{
+        if(balls.length <= 0){
+		  gameOver(true);
+        }
+      }
+    }
+  }
+  
+  //碰撞检测              
+  function testBalls(deg){
+    var balls = levelballs.getElementsByTagName('li');
+    for(var i = 0; i < balls.length; i++){
+      var d = 0 | parseInt(balls[i].style.webkitTransform.slice(7));
+      //console.log(deg, d);
+      if(Math.abs(deg - d) <= 10 || 
+        Math.abs(deg - 360 - d) <= 10){
+      	return false;
+      }
+    }
+    return true;
+  }
+	
+  function gameOver(win){
+    document.body.className = 'trans';
+    var bgcolor = 'red';
+  	if(win){ 
+      location.hash = '#' + (level + 1);
+      bgcolor = 'green';
+    }
+    anim.stop();
+    document.body.style.background = bgcolor;
+    document.documentElement.removeEventListener('touchstart', appendBall);
+    document.documentElement.removeEventListener('mousedown', appendBall);
+    document.body.addEventListener('touchstart', location.reload.bind(location));
+    document.body.addEventListener('mousedown', location.reload.bind(location));    
+  }
+                 
+  document.documentElement.addEventListener('touchstart', appendBall);
+  document.documentElement.addEventListener('mousedown', appendBall);
+}();
+
+//微信分享
+var locationLink = location.href;
+document.write(unescape("%3Cscript src='" + "http://api.wechat.w3ctech.com/js_sdk?url=" + locationLink + "' type='text/javascript'%3E%3C/script%3E"));
+setTimeout(function(){
+  var shareMessage = {
+    title: 'coreball演示', // 分享标题
+    desc: 'css3动画实现的coreball示例', // 分享描述
+    link: location.href, // 分享链接
+    imgUrl: 'http://www.7down.net/attachment/soft/2015/0326/145305_28675362.png', // 分享图标
+    type: 'link', // 分享类型,music、video或link，不填默认为link
+    dataUrl: '', 
+    success: function () { 
+      // 用户确认分享后执行的回调函数
+      //alert('ok share!');
+    },
+    cancel: function () { 
+      // 用户取消分享后执行的回调函数
+      //alert('cancel share!');
+    }      
+  };
+  window.wx && wx.ready(function(){
+    wx.onMenuShareTimeline(shareMessage);
+    wx.onMenuShareAppMessage(shareMessage);
+  });
+},100);
+</script>
+</body>
+</html>
