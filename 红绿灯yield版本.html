@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style type="text/css">
+	html, body{
+ 	height: 100%;
+ 	overflow: hidden;
+    background: black;
+    -webkit-user-select: none;
+    }
+
+	ul {
+	  list-style-type:none;
+	  padding: 0;
+	  margin-left: 12px;
+	}
+
+	ul >li {
+	  width: 40px;
+	  height: 40px;
+	  border-radius:50%;
+	  opacity: 0.3;
+	  display: inline-block;
+	}
+
+	ul.red >#red, 
+	ul.green >#green,
+	ul.yellow >#yellow{
+	  opacity: 1.0;
+	}
+
+	#red {
+	  background: red;
+	}
+
+	#yellow {
+	  background: yellow;
+	}
+
+	#green {
+	  background: green;
+	}
+	</style>
+</head>
+<body>
+	<ul id="traffic" class="green">
+	  <li id="green"></li>
+	  <li id="yellow"></li>
+	  <li id="red"></li>
+	</ul>
+	<script type="text/javascript">
+	function turn(color){
+    	traffic.className = color;
+	}
+
+	function wait(d){
+	    return new Promise(function(resolve, reject) {
+	        setTimeout(resolve,d);
+	    })
+	}
+
+	function run(generator) {
+		var it = generator();
+	    void function () {
+	    	var curr = it.next();
+	        
+	        if(curr.done) {
+	            return ;
+	        }
+
+	        //console.log(curr.value);
+
+	        console.log(arguments.callee);
+
+	        if(curr.value instanceof Promise) {
+	            curr.value.then(arguments.callee);
+	        } else {
+	        	arguments.callee();
+	        }
+	    }();
+	}
+	//执行！
+	run(function*(){
+	    for(;;) {
+	    	yield turn('green');
+	    	yield wait(1000);
+	    	yield turn('yellow');
+	    	yield wait(1000);
+	    	yield turn('red');
+	    	yield wait(1000);
+	    }
+	});
+	</script>
+</body>
+</html>
