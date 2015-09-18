@@ -1,6 +1,24 @@
 (function(){
 	"use strict";
-	var ads = [ 1, 2 ,3 ,4 ,5 ,6,7,8,9];//模拟的广告数据 6到18个广告
+	var ads = [];
+	for( var i = 0 ; i<=10 ; i++ ) { //模拟后台的塞入广告数据 6到18个广告
+		ads.push({
+			name: "name"+i
+		});
+	}
+	console.log(ads);
+
+	ads.sort(function(){ //进入页面随机
+		return Math.random()>0.5;
+	});
+
+	//==============
+	var i = 1 ;
+	ads = ads.map(function(obj) { //加上索引方便判断show切换算法是否正确,调试目的
+		obj.index = i++;
+		return obj;
+	});
+	//var ads = [ 1, 2 ,3 ,4 ,5 ,6,7,8,9];//模拟的广告数据 6到18个广告
 	//var ads = [ 1, 2 ,3 ,4 ,5 ,6,7,8,9,10,11, 12 ,13 ,14 ,15 ,16,17,18];//6到18个大小
 	var len = ads.length;
 	var size = 6;//每帧展示6个
