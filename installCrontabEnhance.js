@@ -1,17 +1,20 @@
 (function() {
 
 	//useage: 传入crontab配置文件的绝对地址
-
 	"use strict";
 	var readline = require('readline');
 	var fs = require('fs');
 	//console.log(__dirname);//当前路径
 	//console.log(__filename);//当前在执行的js文件路径
-	let crontabFile = "crontabTmp";
 	//需要读取的crontab文件地址
 	let filename = process.argv[2] || '/Users/jyy/Downloads/crontab_sh1.log';
-
-	console.log(filename);
+	try {
+		let stat = fs.statSync(filename);
+	} catch(e) {
+		console.error("文件"+filename+" 不存在");
+		process.exit(1) 
+	}
+	
 
 	var existCrontabs = []
     var newCrontabs = [];
@@ -58,6 +61,7 @@
 			//console.log(existCrontabs);
 			//console.log(newCrontabs);
 			//生成新的crontab配置文件
+			let crontabFile = "crontabTmp";
 			fs.writeFile(crontabFile, existCrontabs.concat(newCrontabs).join("\n"), 'utf8', err =>  {
 				if (err) throw err 
 				//写入crontab crontab -e
