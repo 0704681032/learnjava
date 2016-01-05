@@ -7,12 +7,13 @@
 	//console.log(__dirname);//当前路径
 	//console.log(__filename);//当前在执行的js文件路径
 	//需要读取的crontab文件地址
-	let filename = process.argv[2] || '/Users/jyy/Documents/foxdsp/webadmin/target/classes/crontab_sh/crontab_sh.sh';
+	let defaultFile = __dirname.substring(0,__dirname.lastIndexOf("/"))+'/sh/crontab_sh.sh';
+	let filename = process.argv[2] || defaultFile;
 	try {
 		let stat = fs.statSync(filename);
 	} catch(e) {
 		console.error("文件"+filename+" 不存在");
-		process.exit(1) 
+		process.exit(1)
 	}
 	
 
