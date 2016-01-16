@@ -5,15 +5,20 @@ var links = [];
 var results = [];
 var results1 = [];
 
-var casper = require("casper").create();
-
+//var casper = require("casper").create();
+var casper = require("casper").create({
+    viewportSize: {
+        width: 1024,
+        height: 768
+    }
+});
 var fs = require('fs');
 
 var url = 'http://home.51cto.com/index.php?s=/Index/index/reback/http%253A%252F%252Fedu.51cto.com%252F';
 var data = {
     url: url,
-    u: "xxxx",
-    p:"yyyy"
+    u: "your username",
+    p:"your password"
 }
 
 function getLinks() {
@@ -110,7 +115,19 @@ casper.then(function() {
 });
 
 casper.then(function() {
-    this.captureSelector('weather'+(+new Date())+'.png', '#LoginUserInfo');
+    this.captureSelector('weather'+(+new Date())+'.png', 'div.ShowCon.clearfix',{
+        width: 500,
+        height: 400,
+        quality: 100
+    });
+
+    this.capture('google.png', {
+        top: 200,
+        left: 900,
+        width: 500,
+        height: 400
+    });
+
     fs.write("result.html",this.getHTML(), 'w');
     console.log('clicked ok, new location is ' + this.getCurrentUrl());
 });
