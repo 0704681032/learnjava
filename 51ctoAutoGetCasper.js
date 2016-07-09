@@ -82,7 +82,7 @@ casper.then(function() {
 
     this.capture('google.png', {
         top: 0,
-        left: 0,
+        left: 300,
         width: 1024,
         height: 1024
     });
