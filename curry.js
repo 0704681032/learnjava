@@ -31,4 +31,12 @@ var t2 = add1(3)(4)
 console.log(t1(4))
 console.log(t2(4))
 
-
+//via 米粽粽
+function currying(fn, ...args) { 
+	if (fn.length > args.length) { 
+		return funtion (...rest) { 
+			return currying(fn, ...(args.concat(rest))) 
+		} 
+	} 
+	return fn.call(this, ...args) 
+} 
