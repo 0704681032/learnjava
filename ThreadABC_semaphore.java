@@ -6,9 +6,9 @@ public class ThreadABC_semaphore {
 
 	public static void main(String[] args) {
 				
-		Semaphore semaphoreA =  new Semaphore(1);
-		Semaphore semaphoreB =  new Semaphore(1);
-		Semaphore semaphoreC =  new Semaphore(1);
+		Semaphore semaphoreA =  new Semaphore(0);
+		Semaphore semaphoreB =  new Semaphore(0);
+		Semaphore semaphoreC =  new Semaphore(0);
 		
 		Thread threadA = new Thread(new Worker1("A",semaphoreA,semaphoreB));
 		
@@ -16,13 +16,13 @@ public class ThreadABC_semaphore {
 
 		Thread threadC = new Thread(new Worker1("C",semaphoreC,semaphoreA));
 		
-		try {
-			semaphoreA.acquire();
-			semaphoreB.acquire();
-			semaphoreC.acquire();
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		}
+//		try {
+//			semaphoreA.acquire();
+//			semaphoreB.acquire();
+//			semaphoreC.acquire();
+//		} catch (InterruptedException e1) {
+//			e1.printStackTrace();
+//		}
 		
 		
 		threadA.start();
